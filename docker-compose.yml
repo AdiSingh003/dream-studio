@@ -74,7 +74,7 @@ services:
     image: prom/prometheus:v2.47.0
     container_name: dreamforge_prometheus
     ports:
-      - "9092:9090"
+      - "8012:8012"
     volumes:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./configs/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro

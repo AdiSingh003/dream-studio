@@ -871,7 +871,7 @@ def main():
             mlflow_enabled=mlflow_tracker.enabled,
             mlflow_tracking_uri=mf_cfg.get("tracking_uri", "http://localhost:5012"),
             prometheus_enabled=monitor_cfg.get("enable_prometheus", True),
-            prometheus_ui_url=monitor_cfg.get("prometheus_ui_url", "http://localhost:9092"),
+            prometheus_ui_url=monitor_cfg.get("prometheus_ui_url", "http://localhost:8012"),
         )
 
         # Auto-refresh toggle

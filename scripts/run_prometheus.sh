@@ -2,12 +2,12 @@
 # scripts/run_prometheus.sh — Start a dedicated Prometheus instance for DreamForge
 
 echo "Starting DreamForge Monitoring (Prometheus)..."
-echo "UI will be available at: http://localhost:9092"
+echo "UI will be available at: http://localhost:8012"
 
 # Use Docker to run Prometheus but point it to the host metrics
 docker run -d \
     --name dreamforge_prometheus_standalone \
-    -p 9092:9090 \
+    -p 8012:9090 \
     -v $(pwd)/configs/prometheus.yml:/etc/prometheus/prometheus.yml \
     -v $(pwd)/configs/alert_rules.yml:/etc/prometheus/alert_rules.yml \
     --add-host host.docker.internal:host-gateway \
