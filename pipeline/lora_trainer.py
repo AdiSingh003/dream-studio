@@ -93,7 +93,7 @@ class LoRATrainingConfig:
     log_every_n_steps: int = 20
 
     # MLflow (optional)
-    mlflow_tracking_uri: str = "http://localhost:5012"
+    mlflow_tracking_uri: str = "http://mlflow:5012"
     mlflow_experiment:   str = "sd-lora-indian-festivals"
 
     @property
@@ -132,7 +132,7 @@ def load_config(config_path: str = "configs/config.yaml") -> LoRATrainingConfig:
         mixed_precision             = params.get("mixed_precision", "fp16"),
         gradient_accumulation_steps = int(params.get("gradient_accumulation_steps", 2)),
         log_every_n_steps           = int(params.get("log_every_n_steps", 20)),
-        mlflow_tracking_uri         = mlops.get("tracking_uri", "http://localhost:5012"),
+        mlflow_tracking_uri         = mlops.get("tracking_uri", "http://mlflow:5012"),
     )
 
 

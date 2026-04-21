@@ -218,7 +218,7 @@ def render_mlops_dashboard(
     gpu_stats: Dict[str, Any],
     history: List[Dict[str, Any]],
     mlflow_enabled: bool = False,
-    mlflow_tracking_uri: str = "http://localhost:5012",
+    mlflow_tracking_uri: str = "http://mlflow:5012",
     prometheus_enabled: bool = True,
     prometheus_ui_url: str = "http://localhost:9090",
 ):

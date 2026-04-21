@@ -139,7 +139,7 @@ docker compose up --build
 | Service | URL |
 |---|---|
 | Streamlit UI | http://localhost:8503 |
-| MLflow UI | http://localhost:5012 |
+| MLflow UI | http://mlflow:5012 |
 | Prometheus Metrics | http://localhost:8012 |
 
 ### Local Development

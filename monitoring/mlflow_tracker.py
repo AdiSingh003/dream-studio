@@ -31,7 +31,7 @@ class MLflowTracker:
 
     def __init__(
         self,
-        tracking_uri: str = "http://localhost:5012",
+        tracking_uri: str = "http://mlflow:5012",
         experiment_name: str = "stable-diffusion-v1-5",
         artifact_location: Optional[str] = None,
     ):

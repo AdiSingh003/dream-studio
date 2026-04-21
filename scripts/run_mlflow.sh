@@ -4,7 +4,7 @@
 mkdir -p mlflow-artifacts
 
 echo "Starting MLflow server..."
-echo "UI: http://localhost:5012"
+echo "UI: http://mlflow:5012"
 echo "Press Ctrl+C to stop."
 
 mlflow server \

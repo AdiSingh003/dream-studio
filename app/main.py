@@ -377,7 +377,7 @@ def main():
     
     mf_cfg = mlops_cfg.get("mlflow", {})
     mlflow_tracker = get_mlflow_tracker(
-        tracking_uri=mf_cfg.get("tracking_uri", "http://localhost:5012"),
+        tracking_uri=mf_cfg.get("tracking_uri", "http://mlflow:5012"),
         experiment_name=mf_cfg.get("experiment_name", "stable-diffusion-v1-5"),
         artifact_location=mf_cfg.get("artifact_location", None)
     )
@@ -869,7 +869,7 @@ def main():
             gpu_stats=gpu_stats,
             history=history_data,
             mlflow_enabled=mlflow_tracker.enabled,
-            mlflow_tracking_uri=mf_cfg.get("tracking_uri", "http://localhost:5012"),
+            mlflow_tracking_uri=mf_cfg.get("tracking_uri", "http://mlflow:5012"),
             prometheus_enabled=monitor_cfg.get("enable_prometheus", True),
             prometheus_ui_url=monitor_cfg.get("prometheus_ui_url", "http://localhost:8012"),
         )

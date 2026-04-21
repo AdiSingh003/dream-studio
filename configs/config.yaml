@@ -48,7 +48,7 @@ storage:
 
 mlops:
   mlflow:
-    tracking_uri: "http://localhost:5012"
+    tracking_uri: "http://mlflow:5012"
     experiment_name: "stable-diffusion-v1-5"
     artifact_location: "./mlflow-artifacts"
     auto_log: true
