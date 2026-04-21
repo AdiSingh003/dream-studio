@@ -11,51 +11,18 @@
 
 ### *An End-to-End Text-to-Image Generation Studio*
 
-<br/>
-
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.4.0-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
-[![Stable Diffusion](https://img.shields.io/badge/Stable_Diffusion-v1.5-8A2BE2?style=for-the-badge)](https://huggingface.co/stable-diffusion-v1-5)
-[![MLflow](https://img.shields.io/badge/MLflow-Tracking-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)](https://mlflow.org)
-[![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)](https://prometheus.io)
-[![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)](LICENSE)
+> **DreamForge** is a production-grade generative AI studio built on Stable Diffusion v1.5, featuring LoRA domain adaptation, ASHA-guided hyperparameter optimisation, magnitude-based pruning, and a full MLOps observability stack — all packaged in a deployable Docker Compose environment and deployed on **Google Cloud Platform with NVIDIA L4 GPU**.
 
 <br/>
 
-> **DreamForge** is a production-grade generative AI studio built on Stable Diffusion v1.5, featuring LoRA domain adaptation, ASHA-guided hyperparameter optimisation, magnitude-based pruning, and a full MLOps observability stack — all packaged in a deployable Docker Compose environment.
-
-<br/>
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live-ff4b4b?logo=streamlit)](http://35.237.254.142:8503)
+[![MLflow](https://img.shields.io/badge/MLflow-Tracking-0194e2?logo=mlflow)](http://35.237.254.142:5012)
+[![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-e6522c?logo=prometheus)](http://35.237.254.142:9092)
+[![GitHub](https://img.shields.io/badge/GitHub-Source-181717?logo=github)](https://github.com/AdiSingh003/dream-studio)
 
 ---
 
 </div>
-
-## ✦ Highlights at a Glance
-
-| Capability | Result |
-|---|---|
-| 🎨 **LoRA Fine-Tuning** (r = 16) | **27.1% reduction** in validation loss vs. zero-shot baseline |
-| ⚡ **ASHA HPO** | **4.8× faster** than exhaustive grid search |
-| ✂️ **Magnitude Pruning** (20% sparsity) | **18% memory reduction** with < 1.3% quality degradation |
-| 🔬 **Trainable Parameters** | Only **3.4 M** out of 860 M (< 0.4% of UNet) |
-| 📊 **MLOps Overhead** | < 0.3 s per generation — **negligible** impact |
-
----
-
-## 📖 Table of Contents
-
-- [Overview](#-overview)
-- [Architecture](#-architecture)
-- [Quick Start](#-quick-start)
-- [LoRA Fine-Tuning](#-lora-fine-tuning)
-- [Hyperparameter Optimisation](#-asha-hyperparameter-optimisation)
-- [Model Pruning](#-post-training-pruning)
-- [MLOps Stack](#-mlops-stack)
-- [Experimental Results](#-experimental-results)
-- [Project Structure](#-project-structure)
-- [Configuration Reference](#-configuration-reference)
-- [Roadmap](#-roadmap)
-- [Citation](#-citation)
 
 ---
 
@@ -76,6 +43,53 @@ The system is designed from first principles for **reproducibility**, **extensib
 
 ---
 
+## 🚀 Live Deployment (GCP NVIDIA L4)
+
+DreamForge is deployed on **Google Cloud Platform** (`g2-standard-4` instance, NVIDIA L4 24 GB VRAM) as a three-container Docker Compose stack.
+
+| Service | URL | Description |
+|---|---|---|
+| 🎨 **Streamlit UI** | [http://35.237.254.142:8503](http://35.237.254.142:8503) | Image generation interface |
+| 📊 **MLflow UI** | [http://35.237.254.142:5012](http://35.237.254.142:5012) | Experiment tracking & run comparison |
+| 🔥 **Prometheus** | [http://35.237.254.142:9092](http://35.237.254.142:9092) | Real-time metrics & alerts |
+
+**Source Code:** [https://github.com/AdiSingh003/dream-studio](https://github.com/AdiSingh003/dream-studio)
+
+### Production Metrics (Observed on GCP L4)
+
+| Metric | Value |
+|---|---|
+| GPU | NVIDIA L4 |
+| VRAM Total | 22,563 MB |
+| VRAM Used (model loaded) | 2,653 MB (11.8%) |
+| Avg Generation Latency | 4.9 s |
+| Avg Steps/s | 6.9 |
+| P50 Latency | 2.7 s |
+| P95 Latency | 10.5 s |
+| P99 Latency | 11.5 s |
+| Error Rate | 0.0% |
+
+---
+
+## 📸 Screenshots
+
+### Streamlit UI — LoRA Fine-Tuned Image Generation
+> Prompt: *"ganesh chatuthi celebrations"* · Scheduler: DPM++ 2M · Model: Fine-tuned (LoRA) · Size: 512×512
+
+![Streamlit UI](lora_finetuned_image.png)
+
+### MLOps Monitoring Dashboard
+> Real-time GPU status, latency trends, scheduler distribution, and performance metrics
+
+![MLOps Dashboard](mlops_monitoring_dashboard_in_app.png)
+
+### MLflow Experiment Tracking
+> 7 logged runs with generation_time_s, steps_per_second, images_generated, pixels_generated
+
+![MLflow Dashboard](mlflow_dashboard.png)
+
+---
+
 ## 🏗 Architecture
 
 DreamForge is decomposed into four clean tiers:
@@ -93,13 +107,26 @@ DreamForge is decomposed into four clean tiers:
 ├─────────────────────────────────────────────────────────────┤
 │                   MONITORING TIER                           │
 │   MetricsCollector (Prometheus, port 8012)                 │
-│   MLflowTracker (runs, params, artifacts)                  │
-│   DriftDetector (sliding-window statistical alerts)        │
+│   MLflowTracker (runs, params, artifacts, port 5012)       │
+│   DriftDetector (latency + error rate sliding windows)     │
 ├─────────────────────────────────────────────────────────────┤
 │                    TRAINING TIER                            │
 │   LoRATrainer (PEFT · AMP · cosine LR · noise offset)     │
 │   hpo_objective (Optuna + ASHA SuccessiveHalvingPruner)    │
 │   data.py · prepare_mini_data.py                           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Docker Compose Stack (GCP Deployment)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     dreamforge_net (bridge)                 │
+│                                                             │
+│  dreamforge_app        mlflow             prometheus        │
+│  :8503 (Streamlit)     :5012 (UI)         :9092 (UI)        │
+│  :8012 (metrics) ──────────────────────► scrapes :8012      │
+│                        SQLite + volumes                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -130,17 +157,23 @@ pip install -r requirements.txt
 ### Docker Compose (Recommended)
 
 ```bash
-git clone https://github.com/your-org/dreamforge.git
-cd dreamforge
+git clone https://github.com/AdiSingh003/dream-studio.git
+cd dream-studio
 
-docker compose up --build
+# Create .env file
+cp .env.example .env
+# Add your HF token: HUGGING_FACE_HUB_TOKEN=hf_your_token_here
+
+# Build and run all services
+docker compose build --build-arg HF_TOKEN=hf_your_token_here
+docker compose up -d
 ```
 
 | Service | URL |
 |---|---|
 | Streamlit UI | http://localhost:8503 |
-| MLflow UI | http://mlflow:5012 |
-| Prometheus Metrics | http://localhost:8012 |
+| MLflow UI | http://localhost:5012 |
+| Prometheus Metrics | http://localhost:9092 |
 
 ### Local Development
 
@@ -315,7 +348,7 @@ def prune_lora_weights(unet, sparsity=0.20):
 
 ## 📊 MLOps Stack
 
-### Prometheus Metrics  `→ port 8012`
+### Prometheus Metrics  `→ app port 8012 · UI port 9092`
 
 | Metric | Type | Description |
 |---|---|---|
@@ -324,6 +357,8 @@ def prune_lora_weights(unet, sparsity=0.20):
 | `sd_steps_per_second` | Gauge | Current inference throughput |
 | `sd_active_generations` | Gauge | Concurrent in-flight requests |
 | `sd_gpu_memory_used_bytes` | Gauge | CUDA allocated memory |
+
+> The app exports metrics on port **8012** inside the Docker network. The Prometheus container scrapes `dreamforge:8012` and exposes the UI on host port **9092**.
 
 **Alert Rules:**
 
@@ -339,6 +374,7 @@ Every generation and training run is logged as an MLflow run with:
 - **Parameters:** prompt length, steps, guidance scale, scheduler, seed, LoRA mode
 - **Metrics:** latency, steps/s, pixel count, validation loss
 - **Artifacts:** generated images, prompt text
+- **Backend:** SQLite (`mlflow.db`) + host-mounted artifact storage
 
 ### Statistical Drift Detection
 
@@ -365,7 +401,8 @@ Each version stores: HuggingFace model ID · MLflow run ID · evaluation metrics
 
 ## 🔬 Experimental Results
 
-**Hardware:** NVIDIA RTX 3090 (24 GB VRAM) · Intel Core i9-12900K · 64 GB DDR5 · Ubuntu 22.04  
+**Training Hardware:** NVIDIA RTX 3090 (24 GB VRAM) · Intel Core i9-12900K · 64 GB DDR5 · Ubuntu 22.04
+**Production Hardware:** GCP `g2-standard-4` · NVIDIA L4 (24 GB VRAM) · Ubuntu 22.04
 **Software:** PyTorch 2.4.0 · CUDA 12.1 · HuggingFace Diffusers 0.30.3 · PEFT 0.12.0
 
 ### Fine-Tuning Results
@@ -378,6 +415,19 @@ Each version stores: HuggingFace model ID · MLflow run ID · evaluation metrics
 | **LoRA r = 16 (ours)** | **0.1823** | **0.1856** | **3.4 M** | **2.3 h** |
 
 > **27.1% validation loss reduction** over the zero-shot baseline using only **0.39%** of UNet parameters.
+
+### GCP L4 Production Inference
+
+| Metric | Value |
+|---|---|
+| Avg Generation Latency | 4.9 s |
+| Avg Steps/s | 6.9 |
+| P50 Latency | 2.7 s |
+| P95 Latency | 10.5 s |
+| P99 Latency | 11.5 s |
+| VRAM Utilisation | 11.8% (2653 / 22563 MB) |
+| Error Rate | 0.0% |
+| MLflow Runs Logged | 7 (4 generation + 3 model_load) |
 
 ### Scheduler Performance (512×512, 20 steps)
 
@@ -397,47 +447,6 @@ Each version stores: HuggingFace model ID · MLflow run ID · evaluation metrics
 | MLflow logging | ~0.3 s/generation | 6% overhead at 5 s baseline |
 | Prometheus update | < 1 ms | Negligible |
 | Drift detection | < 2 ms | 100-sample window |
-
----
-
-## 📁 Project Structure
-
-```
-dreamforge/
-│
-├── app/
-│   ├── main.py                  # Streamlit orchestration
-│   ├── sidebar.py               # Generation parameter controls
-│   └── metrics_dashboard.py     # Plotly monitoring dashboard
-│
-├── pipeline/
-│   ├── model_manager.py         # Singleton model loader + scheduler swap
-│   ├── inference_engine.py      # GenerationConfig → GenerationResult
-│   ├── prompt_processor.py      # Validation + enhancement
-│   ├── image_processor.py       # Metadata, disk I/O, grid generation
-│   └── batch_processor.py       # PriorityQueue + async worker
-│
-├── monitoring/
-│   ├── metrics_collector.py     # Prometheus Counter/Histogram/Gauge
-│   ├── mlflow_tracker.py        # Run logging + artifact management
-│   └── drift_detector.py        # Sliding-window statistical alerts
-│
-├── training/
-│   ├── train.py                 # LoRATrainer (PEFT, AMP, cosine LR)
-│   ├── hpo_objective.py         # Optuna + ASHA SuccessiveHalvingPruner
-│   ├── prune.py                 # Magnitude-based L1 pruning
-│   ├── data.py                  # Full dataset preparation
-│   └── prepare_mini_data.py     # 100-image/class mini-dataset
-│
-├── configs/
-│   ├── best_trial.yaml          # Best ASHA trial configuration
-│   └── prometheus_alerts.yaml   # Alert rule definitions
-│
-├── registry.json                # Human-readable model registry
-├── docker-compose.yml           # Full stack deployment
-├── Dockerfile
-└── requirements.txt
-```
 
 ---
 
@@ -473,60 +482,11 @@ pruning:
   target: lora_only
 
 monitoring:
-  mlflow_port: 5012
+  mlflow_uri: http://mlflow:5012
   prometheus_port: 8012
   drift_window_size: 100
   drift_latency_warning_pct: 25
   drift_latency_critical_pct: 75
-```
-
----
-
-## 🗺 Roadmap
-
-- [ ] **Extend dataset** — Navratri, Durga Puja, Onam, Pongal
-- [ ] **SDXL base model** — evaluate on higher-resolution generation
-- [ ] **MLflow Model Registry backend** — replace JSON registry with proper MLflow integration
-- [ ] **Automated cultural-semantic augmentation filtering** — flag images where horizontal flipping breaks semantics
-- [ ] **Quantisation** — INT8/INT4 post-training quantisation for edge deployment
-- [ ] **ControlNet integration** — add structural conditioning for layout-aware generation
-- [ ] **REST API** — FastAPI backend for headless inference
-
----
-
-## 📚 Citation
-
-If you use DreamForge in your research, please cite:
-
-```bibtex
-@article{singh2024dreamforge,
-  title     = {DreamForge: An End-to-End Text-to-Image Generation Studio},
-  author    = {Singh, Aditya Pratap and Shankesh, Gadiya Mahek},
-  institution = {Indian Institute of Technology Jodhpur},
-  year      = {2024}
-}
-```
-
-**Key dependencies:**
-
-```bibtex
-@inproceedings{rombach2022ldm,
-  title={High-Resolution Image Synthesis with Latent Diffusion Models},
-  author={Rombach, Robin and Blattmann, Andreas and Lorenz, Dominik and Esser, Patrick and Ommer, Björn},
-  booktitle={CVPR}, year={2022}
-}
-
-@inproceedings{hu2022lora,
-  title={LoRA: Low-Rank Adaptation of Large Language Models},
-  author={Hu, Edward J. and others},
-  booktitle={ICLR}, year={2022}
-}
-
-@inproceedings{li2020asha,
-  title={A System for Massively Parallel Hyperparameter Tuning},
-  author={Li, Liam and Jamieson, Kevin and others},
-  booktitle={MLSys}, year={2020}
-}
 ```
 
 ---
@@ -541,7 +501,7 @@ We thank the **AIMLOps-C4-G16 team** for releasing the IndianFestivals dataset o
 
 **Built with ❤️ at IIT Jodhpur · M.Tech Artificial Intelligence**
 
-*Aditya Pratap Singh · Gadiya Mahek Shankesh*
+*Aditya Pratap Singh (M25CSA002) · Gadiya Mahek Shankesh (M25CSA011)*
 
 <br/>
 
