@@ -2,7 +2,7 @@
 set -e
 
 # Port handling for Cloud Run
-PORT="${PORT:-8501}"
+PORT="${PORT:-8503}"
 
 echo "Starting DreamForge Studio on port ${PORT}..."
 
